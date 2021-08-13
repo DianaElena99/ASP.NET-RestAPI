@@ -8,4 +8,4 @@
   <li>X.PagedList - query pagination <br</li>></ul>
 <br>
 # TO DO:
-Implement CQRS architecture
+<br>Implement CQRS architecture
