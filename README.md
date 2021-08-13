@@ -7,5 +7,5 @@
   <li>Newtonsoft.JSON - easier to work with JSONs <br></li>
   <li>X.PagedList - query pagination <br</li>></ul>
 <br>
-# TO DO:
+<b> TO DO:</b>
 <br>Implement CQRS architecture
