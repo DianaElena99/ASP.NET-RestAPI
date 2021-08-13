@@ -5,6 +5,6 @@ Swagger UI - visualizing and documenting the API  <br>
 AutoMapper Dependency Injection - map data classes to DTOs<br>
 Newtonsoft.JSON - easier to work with JSONs <br>
 X.PagedList - query pagination <br>
-
-TO DO:
+<br>
+# TO DO:<br>
 Implement CQRS architecture
