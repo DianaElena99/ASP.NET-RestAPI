@@ -18,6 +18,7 @@ using Server.Configurations;
 using Server.Repository;
 using Microsoft.AspNetCore.Identity;
 using Server.Services;
+using AspNetCoreRateLimit;
 
 namespace Server
 {
@@ -38,7 +39,9 @@ namespace Server
                 options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
             );
 
-            //services.AddResponseCaching(); 
+            services.AddMemoryCache();
+            services.AddHttpContextAccessor();
+
             services.ConfigureHttpCacheHeaders();
             services.AddAuthentication();
             services.ConfigureIdentity();
@@ -91,6 +94,7 @@ namespace Server
             app.ConfigureExceptionHandler();
 
             app.UseHttpsRedirection();
+            app.UseIpRateLimiting();
 
             app.UseCors("CORSPolicy");
 
