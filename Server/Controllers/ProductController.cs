@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Server.Data;
 using Server.Models;
 using Server.Repository;
 using System;
@@ -33,11 +34,17 @@ namespace Server.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetProducts()
+        ///public async Task<IActionResult> GetProducts()
+        public async Task<IActionResult> GetProducts([FromQuery] RequestParams requestParams)
         {
             try
             {
-                var products = await _unitOfWork.Products.GetAll();
+                var products = new object { };
+                if (requestParams == null)
+                    products = await _unitOfWork.Products.GetAll();
+                else
+                    products = await _unitOfWork.Products.GetPagedList(requestParams);
+
                 var result = _mapper.Map<IList<ProductDTO>>(products);
                 return Ok(result);
             }

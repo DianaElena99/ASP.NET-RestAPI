@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +45,29 @@ namespace Server
                 };
             });
         }
-        
+     
+        public static void ConfigureExceptionHandler(this IApplicationBuilder app)
+        {
+            app.UseExceptionHandler(error =>
+            {
+                error.Run(async context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Response.ContentType = "application/json";
+                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                    if (contextFeature!= null)
+                    {
+                        Console.WriteLine($"Something went wrong : {contextFeature.Error}");
+                        await context.Response.WriteAsync(
+                            new Error 
+                            { 
+                                Message = "Something went wrong",
+                                StatusCode = StatusCodes.Status500InternalServerError
+                            }.ToString()
+                        );
+                    }
+                });
+            });
+        }
     }
 }
