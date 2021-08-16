@@ -16,4 +16,9 @@ namespace Server.Models
         [ForeignKey(nameof(Store))]
         public int StoreId { get; set; }
     }
+
+    public class UpdateProductDTO : CreateProductDTO
+    {
+
+    }
 }

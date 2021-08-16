@@ -20,8 +20,8 @@ namespace Server.Controllers
         private readonly ILogger<ProductController> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductController(IMapper mapper, 
-            ILogger<ProductController> logger, 
+        public ProductController(IMapper mapper,
+            ILogger<ProductController> logger,
             IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
@@ -48,8 +48,7 @@ namespace Server.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}", Name = "GetProduct")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProduct(int id)
@@ -63,6 +62,90 @@ namespace Server.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Something went wrong in {nameof(GetProduct)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later");
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO productDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid POST in {nameof(CreateProduct)}");
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var product = _mapper.Map<Product>(productDTO);
+                await _unitOfWork.Products.Insert(product);
+                await _unitOfWork.Save();
+
+                return CreatedAtRoute("GetProduct", new { id = product.Id }, product);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something went wrong in {nameof(CreateProduct)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later");
+            }
+        }
+
+        [Authorize]
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO productDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var product = await _unitOfWork.Products.Get(q => q.Id == id);
+                if (product == null)
+                {
+                    return BadRequest("Submited Data is invalid");
+                }
+                _mapper.Map(productDTO, product);
+                _unitOfWork.Products.Update(product);
+                await _unitOfWork.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something went wrong in {nameof(UpdateProduct)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later");
+            }
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            try
+            {
+                var product = await _unitOfWork.Products.Get(q => q.Id == id);
+                if (product == null)
+                {
+                    return BadRequest("Submited Data is invalid");
+                }
+
+                await _unitOfWork.Products.Delete(id);
+                await _unitOfWork.Save();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something went wrong in {nameof(DeleteProduct)}");
                 return StatusCode(500, "Internal Server Error. Please Try Again Later");
             }
         }
