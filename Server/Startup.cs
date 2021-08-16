@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Server.Configurations;
 using Server.Repository;
+using Microsoft.AspNetCore.Identity;
+using Server.Services;
 
 namespace Server
 {
@@ -35,6 +37,11 @@ namespace Server
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
             );
+
+            services.AddAuthentication();
+            services.ConfigureIdentity();
+            services.ConfigureJWT(Configuration);
+
             services.AddCors(o =>
                 {
                     o.AddPolicy("CORSPolicy", builder =>
@@ -46,7 +53,10 @@ namespace Server
             );
 
             services.AddAutoMapper(typeof(MapperInitializer));
+
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IAuthManager, AuthManager>();
+
             services.AddControllers().AddNewtonsoftJson( op => 
                 op.SerializerSettings.ReferenceLoopHandling 
                     = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -73,6 +83,7 @@ namespace Server
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server.Repository
 {
-    interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IDisposable
     {
         GenericRepository<Product> Products { get; }
         GenericRepository<Store> Stores { get; }

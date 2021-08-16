@@ -15,6 +15,7 @@ namespace Server.Configurations
             CreateMap<Store, CreateStoreDTO>().ReverseMap();
             CreateMap<Product, ProductDTO>().ReverseMap();
             CreateMap<Product, CreateProductDTO>().ReverseMap();
+            CreateMap<User, UserDTO>().ReverseMap();
         }
     }
 }
