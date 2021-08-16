@@ -30,8 +30,8 @@ namespace Server.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [Authorize]
         [HttpGet]
+        [ResponseCache(CacheProfileName = "120SecondsDuration")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         ///public async Task<IActionResult> GetProducts()

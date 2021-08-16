@@ -67,7 +67,7 @@ namespace Server.Services
             return claims;
         }
 
-        private SigningCredentials GetSigninginCredentials()
+        private static SigningCredentials GetSigninginCredentials()
         {
             var key = Environment.GetEnvironmentVariable("LOGINKEY");
             var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));

@@ -38,6 +38,8 @@ namespace Server
                 options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
             );
 
+            //services.AddResponseCaching(); 
+            services.ConfigureHttpCacheHeaders();
             services.AddAuthentication();
             services.ConfigureIdentity();
             services.ConfigureJWT(Configuration);
@@ -57,10 +59,19 @@ namespace Server
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAuthManager, AuthManager>();
 
-            services.AddControllers().AddNewtonsoftJson( op => 
+            services.AddControllers(config =>
+            {
+                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+                {
+                    Duration = 120
+                });
+            }).AddNewtonsoftJson( op => 
                 op.SerializerSettings.ReferenceLoopHandling 
                     = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             ) ;
+
+            services.ConfigureVersioning();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Server", Version = "v1" });
@@ -83,6 +94,8 @@ namespace Server
 
             app.UseCors("CORSPolicy");
 
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
             app.UseRouting();
 
             app.UseAuthentication();
